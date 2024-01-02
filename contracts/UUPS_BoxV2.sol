@@ -18,9 +18,9 @@ contract UUPS_BoxV2 is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     uint256 private value2; //新增状态变量
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    // constructor() {
-    //     _disableInitializers();
-    // }
+    constructor() {
+        _disableInitializers();
+    }
 
     function initialize(address initialOwner) initializer public {
         __Ownable_init(initialOwner);

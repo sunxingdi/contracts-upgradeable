@@ -2,9 +2,9 @@
 pragma solidity ^0.8.20;
 
 // import "hardhat/console.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-contract TRANS_BoxV2 is Initializable {
+contract TRANS_BoxV2 is Initializable, OwnableUpgradeable {
     
     uint256 private value;
     uint256 private value2; //新增状态变量
@@ -12,10 +12,16 @@ contract TRANS_BoxV2 is Initializable {
     // Emitted when the stored value changes
     event ValueChanged(string Name, uint256 newValue); //修改事件
 
+    event PrtVar(address addr); //修改事件
+
      /// @custom:oz-upgrades-unsafe-allow constructor
-    // constructor() {
-    //     _disableInitializers();
-    // }
+    constructor() {
+        _disableInitializers();
+    }
+
+    function initialize(address initialOwner) initializer public {
+        __Ownable_init(initialOwner);
+    }
 
     // Stores a new value in the contract
     function store(uint256 newValue) public { //修改函数

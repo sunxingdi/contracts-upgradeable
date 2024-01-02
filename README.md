@@ -43,17 +43,32 @@ npx hardhat test .\test\TRANS_BoxProxyV2.test.ts --network localhost
 
 #### 打印输出
 ```
-  透明代理升级合约
+  透明代理升级合约测试
 
- Deploy Contract: BoxV1...
-boxV1 ProxyAddress:           0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82
-boxV1 ImplementationAddress:  0x5FbDB2315678afecb367f032d93F642f64180aa3
-boxV1 AdminAddress:           0x32467b43BFa67273FC7dDda0999Ee9A12F2AaA08
+ 账户列表...
+AdminAccount:  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+OwnerAccount:  0x70997970C51812dc3A010C7d01b50e0d17dc79C8
+UserAccount:   0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
 
- Upgrade Contract: BoxV1 ——> BoxV2...
-boxV2 ProxyAddress:           0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82
-boxV2 ImplementationAddress:  0x5FC8d32690cc91D4c39d9d3abcBD16989F875707
-boxV2 AdminAddress:           0x32467b43BFa67273FC7dDda0999Ee9A12F2AaA08
+ 部署合约: Box...
+boxV1 代理合约地址:  0xc96304e3c037f81dA488ed9dEa1D8F2a48278a75
+boxV1 逻辑合约地址:  0x1291Be112d480055DaFd8a610b7d1e203891C274
+boxV1 管理合约地址:  0x8e0BfED44D5B63812d0693FB248AfA1892dDc036
+
+ 打印固定存储槽...
+逻辑合约地址存储槽
+slot 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc 0x0000000000000000000000001291be112d480055dafd8a610b7d1e203891c274
+管理合约地址存储槽
+slot 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103 0x0000000000000000000000008e0bfed44d5b63812d0693fb248afa1892ddc036
+
+ 升级合约: BoxV1 ——> BoxV2...
+boxV2 代理合约地址:  0xc96304e3c037f81dA488ed9dEa1D8F2a48278a75
+boxV2 逻辑合约地址:  0xCD8a1C3ba11CF5ECfa6267617243239504a98d90
+boxV2 管理合约地址:  0x8e0BfED44D5B63812d0693FB248AfA1892dDc036
+    ✔ 透明代理升级用例 (114ms)
+
+
+  1 passing (734ms)
 ```
 升级后管理合约和代理合约地址不变，只有逻辑合约地址变化。
 
@@ -82,20 +97,71 @@ npx hardhat test .\test\UUPS_BoxProxyV2.test.ts --network localhost
 
 #### 打印输出
 ```
-  UUPS代理升级合约
-account0:  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+  UUPS代理升级合约测试
 
- Deploy Box...
-boxV1 proxyAddress:           0xc6e7DF5E7b4f2A278906862b61205850344D4e7d
-boxV1 ImplementationAddress:  0x3Aa5ebB10DC797CAC828524e59A333d0A371443c
-boxV1 AdminAddress:           0x0000000000000000000000000000000000000000
+ 账户列表...
+AdminAccount:  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+OwnerAccount:  0x70997970C51812dc3A010C7d01b50e0d17dc79C8
+UserAccount:   0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
 
- Upgrade BoxV1 ——> BoxV2...
-boxV2 proxyAddress:           0xc6e7DF5E7b4f2A278906862b61205850344D4e7d
-boxV2 ImplementationAddress:  0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1
-boxV2 AdminAddress:           0x0000000000000000000000000000000000000000
+ 部署合约: Box...
+boxV1 代理合约地址:  0x276C216D241856199A83bf27b2286659e5b877D3
+boxV1 逻辑合约地址:  0x86A2EE8FAf9A840F7a2c64CA3d51209F9A02081D
+boxV1 管理合约地址:  0x0000000000000000000000000000000000000000
+
+ 打印固定存储槽...
+逻辑合约地址存储槽
+slot 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc 0x00000000000000000000000086a2ee8faf9a840f7a2c64ca3d51209f9a02081d
+管理合约地址存储槽
+slot 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103 0x0000000000000000000000000000000000000000000000000000000000000000
+
+ 升级合约: BoxV1 ——> BoxV2...
+boxV2 代理合约地址:  0x276C216D241856199A83bf27b2286659e5b877D3
+boxV2 逻辑合约地址:  0xAA292E8611aDF267e563f334Ee42320aC96D0463
+boxV2 管理合约地址:  0x0000000000000000000000000000000000000000
+    ✔ UUPS代理升级用 (142ms)
+
+
+  1 passing (779ms)
 ```
 升级后代理合约地址不变，只有逻辑合约地址变化。无管理合约，地址为0。
+
+### 地址说明
+为了避免存储槽冲突，OpenZeppelin升级合约文件 [ERC1967Utils.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/proxy/ERC1967/ERC1967Utils.sol) 里定义了几个常量地址：
+
+逻辑合约地址存储槽
+```solidity
+/**
+  * @dev Storage slot with the address of the current implementation.
+  * This is the keccak-256 hash of "eip1967.proxy.implementation" subtracted by 1.
+  */
+// solhint-disable-next-line private-vars-leading-underscore
+bytes32 internal constant IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
+
+```
+
+管理合约地址存储槽
+```solidity
+
+/**
+  * @dev Storage slot with the admin of the contract.
+  * This is the keccak-256 hash of "eip1967.proxy.admin" subtracted by 1.
+  */
+// solhint-disable-next-line private-vars-leading-underscore
+bytes32 internal constant ADMIN_SLOT = 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103;
+
+```
+
+### 账户说明
+可升级合约中涉及三类账户：
+
+- 管理员账户：是部署合约时的账户，只能调用升级函数，不能调用业务函数。
+
+- 所有者账户：在合约初始化时可以指定其他所有者账户，可以调用标记为onlyOwner的函数，不能调用升级函数。部署代理合约时，在代理合约中会创建管理合约实例，所以代理合约和管理合约的所有者账户是同一个。
+
+- 用户账户：只能调用业务函数，不能调用升级函数和标记为onlyOwner的函数。
+
+注意：透明代理必须由部署时的管理员账户来升级，UUPS代理必须由部署时指定的Owner账户来升级。
 
 ### 变更说明
 本次使用OpenZeppenlin 5.0版本和ethers V6版本。
