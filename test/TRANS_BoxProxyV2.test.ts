@@ -1,8 +1,6 @@
-// test/4.BoxProxyV2.test.ts
 import { expect } from "chai"
 import { ethers, upgrades } from "hardhat"
 import { Contract } from "ethers"
-// import { expectEvent } = from "@openzeppelin/test-helpers"
 
 const provider = new ethers.JsonRpcProvider()
 
@@ -28,7 +26,7 @@ describe("透明代理升级合约测试", function () {
     console.log("OwnerAccount: ", OwnerAccount.address) //合约所有者：accounts[1]
     console.log("UserAccount:  ", UserAccount.address)  //用户账户  ：accounts[2]
 
-    const Contract_Factory_Box   = await ethers.getContractFactory("TRANS_Box", AdminAccount)
+    const Contract_Factory_Box   = await ethers.getContractFactory("TRANS_BoxV1", AdminAccount)
     const Contract_Factory_BoxV2 = await ethers.getContractFactory("TRANS_BoxV2", AdminAccount) //必须指定管理员账户，否则升级失败
     
     //合约初始化：42

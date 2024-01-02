@@ -27,7 +27,7 @@ describe("UUPS代理升级合约测试", function () {
     console.log("OwnerAccount: ", OwnerAccount.address) //合约所有者：accounts[1]
     console.log("UserAccount:  ", UserAccount.address)  //用户账户  ：accounts[2]
 
-    const Contract_Factory_Box   = await ethers.getContractFactory("UUPS_Box", AdminAccount)
+    const Contract_Factory_Box   = await ethers.getContractFactory("UUPS_BoxV1", AdminAccount)
     const Contract_Factory_BoxV2 = await ethers.getContractFactory("UUPS_BoxV2", OwnerAccount) //必须指定Owner账户，否则升级失败
 
     //合约初始化：42

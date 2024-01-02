@@ -15,8 +15,18 @@ npm install --save-dev @nomicfoundation/hardhat-toolbox
 npx hardhat node
 ```
 
+#### 配置自定义网络和账户
+在.env文件中配置
+```
+# 测试网络地址
+SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/your_infura_api_key
 
-### 2. 透明代理升级说明
+# 账户地址
+PRIVATE_KEY=your_private_key_without_0x_prefix
+```
+
+
+### 2. 透明代理升级
 
 
 #### 原理介绍
@@ -35,13 +45,13 @@ npx hardhat node
   文件路径：待部署的合约文件。
 
 
-#### 执行命令
+#### 本地网络执行测试用例
 ```shell
 npx hardhat test .\test\TRANS_BoxProxyV2.test.ts --network localhost
 ```
 
 
-#### 打印输出
+#### 本地网络打印输出
 ```
   透明代理升级合约测试
 
@@ -72,8 +82,19 @@ boxV2 管理合约地址:  0x8e0BfED44D5B63812d0693FB248AfA1892dDc036
 ```
 升级后管理合约和代理合约地址不变，只有逻辑合约地址变化。
 
+#### 测试网部署和升级合约
 
-### 3. UUPS代理升级说明
+部署合约
+```
+npx hardhat run .\scripts\1.TRANS_Deploy_BoxV1.ts --network sepolia
+```
+
+升级合约
+```
+npx hardhat run .\scripts\2.TRANS_Upgrade_BoxV2.ts --network sepolia
+```
+
+### 3. UUPS代理升级
 
 #### 原理介绍
 UUPS代理（Universal Upgradeable Proxy Standard，通用可升级代理），涉及2个合约，升级函数在逻辑合约中：
@@ -89,13 +110,13 @@ UUPS代理（Universal Upgradeable Proxy Standard，通用可升级代理），�
   逻辑合约中需要包含初始化函数 [Initializable.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/proxy/utils/Initializable.sol) 和升级函数 [UUPSUpgradeable.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/proxy/utils/UUPSUpgradeable.sol)。
 
 
-#### 执行命令
+#### 本地网络执行测试用例
 ```shell
 npx hardhat test .\test\UUPS_BoxProxyV2.test.ts --network localhost
 ```
 
 
-#### 打印输出
+#### 本地网络打印输出
 ```
   UUPS代理升级合约测试
 
@@ -162,6 +183,12 @@ bytes32 internal constant ADMIN_SLOT = 0xb53127684a568b3173ae13b9f8a6016e243e63b
 - 用户账户：只能调用业务函数，不能调用升级函数和标记为onlyOwner的函数。
 
 注意：透明代理必须由部署时的管理员账户来升级，UUPS代理必须由部署时指定的Owner账户来升级。
+
+查看本地网络账户列表：
+`npx hardhat accounts --network localhost` 或 `npx hardhat accounts`
+
+查看指定网络账户列表：
+`npx hardhat accounts --network sepolia`
 
 ### 变更说明
 本次使用OpenZeppenlin 5.0版本和ethers V6版本。

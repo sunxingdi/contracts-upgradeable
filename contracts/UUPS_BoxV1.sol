@@ -12,7 +12,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 // import "hardhat/console.sol";
 
-contract UUPS_Box is Initializable, OwnableUpgradeable, UUPSUpgradeable {
+contract UUPS_BoxV1 is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     uint256 private value;
 
