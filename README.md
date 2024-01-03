@@ -89,10 +89,57 @@ boxV2 管理合约地址:  0x8e0BfED44D5B63812d0693FB248AfA1892dDc036
 npx hardhat run .\scripts\1.TRANS_Deploy_BoxV1.ts --network sepolia
 ```
 
+部署完成打印输出
+```
+ 账户列表...
+AdminAccount:  0x6BBC4994BFA366B19541a0252148601a9f874cD1
+
+ 部署合约: Box...
+
+boxV1 代理合约地址:  0xECb89780291121Ff8b4751d0b4e1B766FD276a50
+boxV1 逻辑合约地址:  0xad487b215cac4EA21012d7fe624b01640B0A8ff2
+boxV1 管理合约地址:  0xC830f6088cb0D76a07893dB2e47AA20F028e1a15
+
+ 打印固定存储槽...
+逻辑合约地址存储槽
+slot 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc 0x000000000000000000000000ad487b215cac4ea21012d7fe624b01640b0a8ff2
+管理合约地址存储槽
+slot 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103 0x000000000000000000000000c830f6088cb0d76a07893db2e47aa20f028e1a15
+```
+
 升级合约
 ```
 npx hardhat run .\scripts\2.TRANS_Upgrade_BoxV2.ts --network sepolia
 ```
+
+升级完成打印输出
+```
+ 账户列表...
+AdminAccount:  0x6BBC4994BFA366B19541a0252148601a9f874cD1
+
+ 升级合约: BoxV1 ——> BoxV2...
+
+boxV2 代理合约地址:  0xECb89780291121Ff8b4751d0b4e1B766FD276a50
+boxV2 逻辑合约地址:  0xa67CAaE5d31f97928362dC3aE7031e9fb705fD06
+boxV2 管理合约地址:  0xC830f6088cb0D76a07893dB2e47AA20F028e1a15
+
+ 打印固定存储槽...
+逻辑合约地址存储槽
+slot 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc 0x000000000000000000000000a67caae5d31f97928362dc3ae7031e9fb705fd06
+管理合约地址存储槽
+slot 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103 0x000000000000000000000000c830f6088cb0d76a07893db2e47aa20f028e1a15
+
+ 验证升级... （调用新增函数成功不抛异常表示升级OK）
+boxV2.get_value():  0n
+```
+
+#### Etherscan上传和验证合约代码
+
+- 逻辑合约：需要上传和验证合约代码。
+- 代理合约：需要设置为代理合约。先验证逻辑合约，再设置代理合约。
+- 管理合约：无需验证和设置。
+
+参照： [ETHERSCAN上传和验证智能合约代码](./docs/ETHERSCAN上传和验证智能合约代码.md)
 
 ### 3. UUPS代理升级
 
