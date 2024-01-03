@@ -1,11 +1,11 @@
-# OpenZeppenlin升级合约
+# OpenZeppenlin升级合约实战项目
 
 ### 1. 环境准备
 
 #### 安装依赖插件
 ```shell
-npm install @openzeppelin/contracts-upgradeable @openzeppelin/hardhat-upgrades hardhat
-npm install --save-dev @nomicfoundation/hardhat-toolbox
+npm install @openzeppelin/contracts-upgradeable @openzeppelin/hardhat-upgrades hardhat dotenv
+npm install --save-dev @nomicfoundation/hardhat-toolbox @nomiclabs/hardhat-etherscan
 ```
 
 可执行`npm install`命令安装package.json文件中的所有库。
@@ -23,6 +23,9 @@ SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/your_infura_api_key
 
 # 账户地址
 PRIVATE_KEY=your_private_key_without_0x_prefix
+
+# 区块浏览器 API KEY
+ETHERSCAN_API_KEY=your_etherscan_api_key
 ```
 
 
@@ -85,7 +88,7 @@ boxV2 管理合约地址:  0x8e0BfED44D5B63812d0693FB248AfA1892dDc036
 #### 测试网部署和升级合约
 
 部署合约
-```
+```shell
 npx hardhat run .\scripts\1.TRANS_Deploy_BoxV1.ts --network sepolia
 ```
 
@@ -107,8 +110,15 @@ slot 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc 0x000000
 slot 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103 0x000000000000000000000000c830f6088cb0d76a07893db2e47aa20f028e1a15
 ```
 
-升级合约
+修改升级脚本中的代理合约地址
 ```
+//填写代理合约地址
+const boxV1_adress = "0xECb89780291121Ff8b4751d0b4e1B766FD276a50";
+```
+
+升级合约
+
+```shell
 npx hardhat run .\scripts\2.TRANS_Upgrade_BoxV2.ts --network sepolia
 ```
 
@@ -133,13 +143,7 @@ slot 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103 0x000000
 boxV2.get_value():  0n
 ```
 
-#### Etherscan上传和验证合约代码
-
-- 逻辑合约：需要上传和验证合约代码。
-- 代理合约：需要设置为代理合约。先验证逻辑合约，再设置代理合约。
-- 管理合约：无需验证和设置。
-
-参照： [ETHERSCAN上传和验证智能合约代码](./docs/ETHERSCAN上传和验证智能合约代码.md)
+同样，升级后管理合约和代理合约地址不变，只有逻辑合约地址变化。
 
 ### 3. UUPS代理升级
 
@@ -194,7 +198,78 @@ boxV2 管理合约地址:  0x0000000000000000000000000000000000000000
 ```
 升级后代理合约地址不变，只有逻辑合约地址变化。无管理合约，地址为0。
 
-### 地址说明
+#### 测试网部署和升级合约
+
+部署合约
+```shell
+npx hardhat run .\scripts\3.UUPS_Deploy_BoxV1.ts --network sepolia
+```
+
+部署完成打印输出
+```
+网络设置：使用远端RPC网络 sepolia
+
+ 账户列表...
+AdminAccount:  0x6BBC4994BFA366B19541a0252148601a9f874cD1
+
+ 部署合约: Box...
+
+boxV1 代理合约地址:  0x6Def13bEf6F168f6abD2188B29446dbcFf286463
+boxV1 逻辑合约地址:  0xb3ee649472230477BFA168DebBC4c1cae761D63C
+boxV1 管理合约地址:  0x0000000000000000000000000000000000000000
+
+ 打印固定存储槽...
+逻辑合约地址存储槽
+slot 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc 0x000000000000000000000000b3ee649472230477bfa168debbc4c1cae761d63c
+管理合约地址存储槽
+slot 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103 0x0000000000000000000000000000000000000000000000000000000000000000 
+```
+
+修改升级脚本中的代理合约地址
+```
+//填写代理合约地址
+const boxV1_adress = "0x6Def13bEf6F168f6abD2188B29446dbcFf286463";
+```
+
+升级合约
+```shell
+npx hardhat run .\scripts\4.UUPS_Upgrade_BoxV2.ts --network sepolia
+```
+
+升级完成打印输出
+```
+网络设置：使用远端RPC网络 sepolia
+
+ 账户列表...
+AdminAccount:  0x6BBC4994BFA366B19541a0252148601a9f874cD1
+
+ 升级合约: BoxV1 ——> BoxV2...
+
+boxV2 代理合约地址:  0x6Def13bEf6F168f6abD2188B29446dbcFf286463
+boxV2 逻辑合约地址:  0x26a9bb767E3fE0aaF8C4b51F76a33a5ce827CbA2
+boxV2 管理合约地址:  0x0000000000000000000000000000000000000000
+
+ 打印固定存储槽...
+逻辑合约地址存储槽
+slot 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc 0x00000000000000000000000026a9bb767e3fe0aaf8c4b51f76a33a5ce827cba2
+管理合约地址存储槽
+slot 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103 0x0000000000000000000000000000000000000000000000000000000000000000
+
+ 验证升级... （调用新增函数成功不抛异常表示升级OK）
+boxV2.get_value():  0n
+```
+
+同样，升级后代理合约地址不变，只有逻辑合约地址变化。无管理合约，地址为0。
+
+### 4. Etherscan上传和验证合约代码
+
+- 逻辑合约：需要上传和验证合约代码。
+- 代理合约：需要设置为代理合约。先验证逻辑合约，再设置代理合约。
+- 管理合约：无需验证和设置。
+
+详见步骤见另一篇文档： [ETHERSCAN上传和验证智能合约代码](./docs/ETHERSCAN上传和验证智能合约代码.md)
+
+### 5. 地址说明
 为了避免存储槽冲突，OpenZeppelin升级合约文件 [ERC1967Utils.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/proxy/ERC1967/ERC1967Utils.sol) 里定义了几个常量地址：
 
 逻辑合约地址存储槽
@@ -220,7 +295,14 @@ bytes32 internal constant ADMIN_SLOT = 0xb53127684a568b3173ae13b9f8a6016e243e63b
 
 ```
 
-### 账户说明
+### 6. 网络说明
+hardhat框架可使用 `--network` 参数指定网络。
+
+无 `--network` 参数，表示使用hardhat内置网络。
+
+参数 `--network localhost` 表示使用本地网络，使用 `npx hardhat node` 部署本地网络，支持fork公网。
+
+### 7. 账户说明
 可升级合约中涉及三类账户：
 
 - 管理员账户：是部署合约时的账户，只能调用升级函数，不能调用业务函数。
@@ -237,15 +319,14 @@ bytes32 internal constant ADMIN_SLOT = 0xb53127684a568b3173ae13b9f8a6016e243e63b
 查看指定网络账户列表：
 `npx hardhat accounts --network sepolia`
 
-### 变更说明
+### 8. 变更说明
 本次使用OpenZeppenlin 5.0版本和ethers V6版本。
 
 ethersV6 vs ethersV5变更点：
 - 获取合约地址，box.address变更为await box.getAddress()
 - 整数转大数，BigNumber.from("1000")变更为BigInt("1000")
 
-
-### 其他说明
+### 9. 其他说明
 OpenZeppelin有两类合约库：
 
 普通的合约库：https://github.com/OpenZeppelin/openzeppelin-contracts
@@ -254,7 +335,7 @@ OpenZeppelin有两类合约库：
 
 普通合约存在构造函数constructor，可升级合约没有构造函数，通过initializer进行初始化。
 
-### 参考文章
+### 10. 参考文章
 
 [深入理解合约升级(4) - 合约升级原理的代码实现](https://mirror.xyz/xyyme.eth/VSyU0JfmVrcqN-F28tX5mzYjxFFAosl8tDAQX3vB5Dg)
 

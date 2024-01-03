@@ -1,12 +1,29 @@
+import { HardhatRuntimeEnvironment } from 'hardhat/types';
+import { SEPOLIA_RPC_URL } from "../hardhat.config";
 import { ethers, upgrades } from "hardhat"
-import { Contract } from "ethers"
+import { Contract, providers  } from "ethers"
 
-const provider = new ethers.JsonRpcProvider()
+let provider: providers.JsonRpcProvider;
 
 async function getSlotStorage(contract_address:string, slot_number:number) {
   let SlotStorage = await provider.getStorage(contract_address, slot_number)
   console.log("slot", slot_number.toString().padStart(3, '0'), SlotStorage)
   return SlotStorage
+}
+
+async function waitForReceipt(Box:Contract, Prtflag:boolean = false) {
+  const ContractInstance = await Box.waitForDeployment();
+  console.log("\nContractInstance: \n", ContractInstance);
+  const ContractTransactionResponse = await ContractInstance.deploymentTransaction()
+  console.log("\nContractTransactionResponse: \n", ContractTransactionResponse);
+
+  const txHash = ContractTransactionResponse.hash //获取交易哈希
+  const txReceipt = await provider.waitForTransaction(txHash); //等待交易完成，返回交易回执
+  // const txReceipt = await provider.getTransactionReceipt(txHash); //该方法有问题，不等待直接获取回执，可能交易还未完成。
+  console.log("\ntxReceipt: \n", txReceipt, "\n");
+
+  if (true == Prtflag) {
+  }
 }
 
 async function main() {
@@ -15,6 +32,22 @@ async function main() {
   // let boxV2: Contract
   
   let AdminAccount
+
+  // 设置网络
+  const hre: HardhatRuntimeEnvironment = await import('hardhat');
+  const networkName = hre.network.name; // 获取通过命令行传递的 --network 参数值
+
+  if (networkName === 'sepolia') {
+    provider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
+    console.log('网络设置：使用远端RPC网络', networkName);
+
+  } else if (networkName === 'localhost' || networkName === 'hardhat') {
+    provider = new ethers.JsonRpcProvider();
+    console.log('网络设置：使用本地网络...');  
+
+  } else {
+    throw new Error("网络参数错误，请检查...");
+  }
 
   //获取账户
   [AdminAccount] = await ethers.getSigners();
@@ -29,7 +62,7 @@ async function main() {
   //合约初始化：42
   console.log("\n", "部署合约: Box...");
   boxV1 = await upgrades.deployProxy(Contract_Factory_Box, [AdminAccount.address], { kind: 'uups', initializer: 'initialize'})
-  await boxV1.waitForDeployment();
+  await waitForReceipt(boxV1, true);
 
   const boxV1_adress = await boxV1.getAddress()
 

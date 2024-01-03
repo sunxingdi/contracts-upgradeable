@@ -1,8 +1,9 @@
+import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { SEPOLIA_RPC_URL } from "../hardhat.config";
 import { ethers, upgrades } from "hardhat"
-import { Contract } from "ethers"
+import { Contract, providers  } from "ethers"
 
-const provider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL)
+let provider: providers.JsonRpcProvider;
 
 async function getSlotStorage(contract_address:string, slot_number:number) {
   let SlotStorage = await provider.getStorage(contract_address, slot_number)
@@ -32,6 +33,22 @@ async function main() {
   
   let AdminAccount
 
+  // 设置网络
+  const hre: HardhatRuntimeEnvironment = await import('hardhat');
+  const networkName = hre.network.name; // 获取通过命令行传递的 --network 参数值
+
+  if (networkName === 'sepolia') {
+    provider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
+    console.log('网络设置：使用远端RPC网络', networkName);
+
+  } else if (networkName === 'localhost' || networkName === 'hardhat') {
+    provider = new ethers.JsonRpcProvider();
+    console.log('网络设置：使用本地网络...');  
+
+  } else {
+    throw new Error("网络参数错误，请检查...");
+  }
+
   //获取账户
   [AdminAccount] = await ethers.getSigners();
   
@@ -46,6 +63,7 @@ async function main() {
   console.log("\n", "部署合约: Box...");
   boxV1 = await upgrades.deployProxy(Contract_Factory_Box, [AdminAccount.address], { initializer: 'initialize' })
   await waitForReceipt(boxV1, true);
+
   const boxV1_adress = await boxV1.getAddress()
 
   console.log("boxV1 代理合约地址: ", boxV1_adress)

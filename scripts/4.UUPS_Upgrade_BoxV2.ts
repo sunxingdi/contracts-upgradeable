@@ -1,12 +1,27 @@
+import { SEPOLIA_RPC_URL } from "../hardhat.config";
 import { ethers, upgrades } from "hardhat"
-import { Contract } from "ethers"
+import { Contract, providers } from "ethers"
 
-const provider = new ethers.JsonRpcProvider()
+let provider: providers.JsonRpcProvider;
 
 async function getSlotStorage(contract_address:string, slot_number:number) {
   let SlotStorage = await provider.getStorage(contract_address, slot_number)
   console.log("slot", slot_number.toString().padStart(3, '0'), SlotStorage)
   return SlotStorage
+}
+
+async function waitForReceipt(Box:Contract, Prtflag:boolean = false) {
+  const ContractInstance = await Box.waitForDeployment();
+  console.log("\nContractInstance: \n", ContractInstance);
+  // const ContractTransactionResponse = ContractInstance.deployTransaction;
+  // console.log("\nContractTransactionResponse: \n", ContractTransactionResponse);
+  const txHash = ContractInstance.deployTransaction.hash //获取交易哈希
+  const txReceipt = await provider.waitForTransaction(txHash); //等待交易完成，返回交易回执
+  // const txReceipt = await provider.getTransactionReceipt(txHash); //该方法有问题，不等待直接获取回执，可能交易还未完成。
+  console.log("\ntxReceipt: \n", txReceipt, "\n");
+
+  if (true == Prtflag) {
+  }
 }
 
 async function main() {
@@ -16,7 +31,24 @@ async function main() {
   
   let AdminAccount
 
-  const boxV1_adress = "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318";
+  //填写代理合约地址
+  const boxV1_adress = "0x6Def13bEf6F168f6abD2188B29446dbcFf286463";
+
+  // 设置网络
+  const hre: HardhatRuntimeEnvironment = await import('hardhat');
+  const networkName = hre.network.name; // 获取通过命令行传递的 --network 参数值
+
+  if (networkName === 'sepolia') {
+    provider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
+    console.log('网络设置：使用远端RPC网络', networkName);
+
+  } else if (networkName === 'localhost' || networkName === 'hardhat') {
+    provider = new ethers.JsonRpcProvider();
+    console.log('网络设置：使用本地网络...');  
+
+  } else {
+    throw new Error("网络参数错误，请检查...");
+  }
 
   //获取账户
   [AdminAccount] = await ethers.getSigners();
@@ -31,6 +63,7 @@ async function main() {
   //合约升级
   console.log("\n", "升级合约: BoxV1 ——> BoxV2...");
   boxV2 = await upgrades.upgradeProxy(boxV1_adress, Contract_Factory_BoxV2)
+  await waitForReceipt(boxV2, true);
   const boxV2_adress = await boxV2.getAddress()
 
   console.log("boxV2 代理合约地址: ", boxV2_adress)
